@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>ملاحظات مع حفظ في مجلد</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    direction: rtl;
+    margin: 0; padding: 0;
+    background: #fffbe6;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+  header {
+    background: #f9d976;
+    padding: 10px 20px;
+    text-align: center;
+    font-size: 24px;
+    font-weight: bold;
+    color: #333;
+  }
+  #toolbar {
+    padding: 10px;
+    background: #f7d654;
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+  button {
+    background: #f9d976;
+    border: none;
+    padding: 8px 14px;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 5px;
+    color: #333;
+  }
+  button:hover {
+    background: #f7c046;
+  }
+  select {
+    padding: 6px 10px;
+    font-size: 16px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    cursor: pointer;
+  }
+  #note {
+    flex: 1;
+    padding: 15px;
+    font-size: 18px;
+    border: none;
+    resize: none;
+    outline: none;
+    background: #fffbe6;
+    white-space: pre-wrap;
+    font-weight: normal;
+    font-style: normal;
+    font-family: Arial, sans-serif;
+  }
+  #note.bold {
+    font-weight: bold;
+  }
+  #note.italic {
+    font-style: italic;
+  }
+  #message {
+    text-align: center;
+    margin-top: 5px;
+    color: green;
+    font-weight: bold;
+  }
+</style>
+</head>
+<body>
+
+<header>ملاحظات مع حفظ في مجلد</header>
+
+<div id="toolbar">
+  <button onclick="toggleBold()">عريض</button>
+  <button onclick="toggleItalic()">مائل</button>
+  
+  <label for="fontSelect">الخط:</label>
+  <select id="fontSelect" onchange="changeFont()">
+    <option value="Arial, sans-serif">Arial</option>
+    <option value="'Courier New', Courier, monospace">Courier New</option>
+    <option value="'Times New Roman', Times, serif">Times New Roman</option>
+    <option value="'Georgia', serif">Georgia</option>
+    <option value="'Tahoma', sans-serif">Tahoma</option>
+    <option value="'Verdana', sans-serif">Verdana</option>
+    <option value="'Comic Sans MS', cursive, sans-serif">Comic Sans MS</option>
+  </select>
+  
+  <select id="bgColor" onchange="changeBgColor()">
+    <option value="#fffbe6">خلفية افتراضية</option>
+    <option value="#ffffff">أبيض</option>
+    <option value="#ffefef">وردي فاتح</option>
+    <option value="#e6fff3">أخضر فاتح</option>
+    <option value="#e6f0ff">أزرق فاتح</option>
+    <option value="#fff7e6">برتقالي فاتح</option>
+  </select>
+  
+  <button onclick="saveNote()">حفظ الملاحظة</button>
+  <button onclick="clearNote()">مسح الملاحظة</button>
+</div>
+
+<textarea id="note" placeholder="اكتب ملاحظاتك هنا..."></textarea>
+<div id="message"></div>
+
+<script>
+  const note = document.getElementById('note');
+  const bgColorSelect = document.getElementById('bgColor');
+  const fontSelect = document.getElementById('fontSelect');
+  const message = document.getElementById('message');
+
+  // تحميل الملاحظة والتنسيقات واللون والخط من التخزين المحلي
+  note.value = localStorage.getItem('simpleNote') || '';
+  if(localStorage.getItem('noteBold') === 'true') note.classList.add('bold');
+  if(localStorage.getItem('noteItalic') === 'true') note.classList.add('italic');
+  const bg = localStorage.getItem('noteBgColor') || '#fffbe6';
+  note.style.backgroundColor = bg;
+  bgColorSelect.value = bg;
+  const savedFont = localStorage.getItem('noteFont') || "Arial, sans-serif";
+  note.style.fontFamily = savedFont;
+  fontSelect.value = savedFont;
+
+  // حفظ الملاحظة تلقائيًا عند التغيير
+  note.addEventListener('input', () => {
+    localStorage.setItem('simpleNote', note.value);
+  });
+
+  // وظائف التنسيق
+  function toggleBold() {
+    note.classList.toggle('bold');
+    localStorage.setItem('noteBold', note.classList.contains('bold'));
+  }
+  function toggleItalic() {
+    note.classList.toggle('italic');
+    localStorage.setItem('noteItalic', note.classList.contains('italic'));
+  }
+
+  // تغيير لون الخلفية وحفظه
+  function changeBgColor() {
+    const color = bgColorSelect.value;
+    note.style.backgroundColor = color;
+    localStorage.setItem('noteBgColor', color);
+  }
+
+  // تغيير الخط وحفظه
+  function changeFont() {
+    const font = fontSelect.value;
+    note.style.fontFamily = font;
+    localStorage.setItem('noteFont', font);
+  }
+
+  // حفظ الملاحظة في ملف نصي داخل مجلد تختاره (يدعم كروم فقط)
+  async function saveNote() {
+    if (!window.showSaveFilePicker) {
+      alert('/Document/KiNote');
+      return;
+    }
+    try {
+      const options = {
+        types: [{
+          description: 'ملفات نصية',
+          accept: {'text/plain': ['.txt']},
+        }],
+        suggestedName: 'KiNote.txt',
+        excludeAcceptAllOption: false,
+      };
+      // يفتح مربع اختيار ملف الحفظ مع اسم مقترح
+      const handle = await window.showSaveFilePicker(options);
+      const writable = await handle.createWritable();
+      await writable.write(note.value);
+      await writable.close();
+      message.textContent = 'تم الحفظ بنجاح!';
+      setTimeout(() => message.textContent = '', 3000);
+    } catch (err) {
+      if (err.name === 'AbortError') {
+        message.textContent = 'تم إلغاء الحفظ.';
+      } else {
+        message.textContent = 'حدث خطأ أثناء الحفظ.';
+        console.error(err);
+      }
+      setTimeout(() => message.textContent = '', 3000);
+    }
+  }
+
+  // مسح الملاحظة والتنسيقات من النافذة ومن التخزين المحلي
+  function clearNote() {
+    if(confirm('هل تريد مسح الملاحظة؟')) {
+      note.value = '';
+      note.classList.remove('bold', 'italic');
+      localStorage.removeItem('simpleNote');
+      localStorage.removeItem('noteBold');
+      localStorage.removeItem('noteItalic');
+      localStorage.removeItem('noteBgColor');
+      localStorage.removeItem('noteFont');
+      note.style.backgroundColor = '#fffbe6';
+      bgColorSelect.value = '#fffbe6';
+      note.style.fontFamily = "Arial, sans-serif";
+      fontSelect.value = "Arial, sans-serif";
+      message.textContent = 'تم مسح الملاحظة.';
+      setTimeout(() => message.textContent = '', 3000);
+    }
+  }
+</script>
+
+</body>
+</html>
