@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Form</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f5f5f5;
+            font-family: Arial, sans-serif;
+        }
+        .login-container {
+            background: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        .login-container h2 {
+            margin-bottom: 20px;
+            color: #333;
+        }
+        .login-container .social-btn {
+            display: inline-block;
+            padding: 10px 20px;
+            margin: 5px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .login-container .social-btn.google {
+            background-color: #fff;
+        }
+        .login-container .social-btn.apple {
+            background-color: #000;
+            color: #fff;
+        }
+        .login-container .or {
+            margin: 10px 0;
+            color: #666;
+        }
+        .login-container input {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+        .login-container button {
+            width: 100%;
+            padding: 10px;
+            background-color: #8a4af3;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .login-container .links a {
+            color: #8a4af3;
+            text-decoration: none;
+            margin: 0 10px;
+        }
+        .error {
+            color: red;
+            display: none;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <h2>تسجيل الدخول إلى حسابك 🙌</h2>
+        <div class="social-btn google">تسجيل الدخول باستخدام Google</div>
+        <div class="social-btn apple">تسجيل الدخول باستخدام Apple</div>
+        <div class="or">أو</div>
+        <input type="email" id="email" placeholder="بريدك الإلكتروني" required>
+        <input type="password" id="password" placeholder="كلمة المرور" required>
+        <button onclick="validateForm()">تسجيل الدخول</button>
+        <div class="links">
+            <a href="#" onclick="resetPassword()">إعادة تعيين كلمة المرور</a>
+            <a href="#" onclick="signUp()">ليس لديك حساب؟ تسجيل جديد</a>
+        </div>
+        <div id="errorMsg" class="error">يرجى إدخال بريد إلكتروني وكلمة مرور صحيحين.</div>
+    </div>
+
+    <script>
+        function validateForm() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const errorMsg = document.getElementById('errorMsg');
+
+            if (!email.includes('@') || password.length < 6) {
+                errorMsg.style.display = 'block';
+            } else {
+                errorMsg.style.display = 'none';
+                alert('تسجيل الدخول ناجح! (محاكاة)');
+            }
+        }
+
+        function resetPassword() {
+            alert('صفحة إعادة تعيين كلمة المرور (محاكاة)');
+        }
+
+        function signUp() {
+            alert('صفحة تسجيل جديد (محاكاة). يرجى إدخال بريد إلكتروني وكلمة مرور جديدة!');
+            // هنا يمكنك إضافة نموذج تسجيل جديد حقيقي
+        }
+    </script>
+</body>
+</html>
